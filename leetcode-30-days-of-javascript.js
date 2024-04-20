@@ -212,3 +212,55 @@ const limited2 = timeLimit2((t) => new Promise(res => setTimeout(res, t)), 100);
 limited2(150).catch(console.log) // "Time Limit Exceeded" at t=100ms
 
 // 3.
+// Write a class that allows getting and setting key-value pairs, however a time until expiration is associated with each key.
+// The class has three public methods:
+// set(key, value, duration): accepts an integer key, an integer value, and a duration in milliseconds. Once the duration has elapsed, the key should be inaccessible. The method should return true if the same un-expired key already exists and false otherwise. Both the value and duration should be overwritten if the key already exists.
+// get(key): if an un-expired key exists, it should return the associated value. Otherwise it should return -1.
+// count(): returns the count of un-expired keys.
+
+class TimeLimitedCache {
+  constructor(cacheMap = new Map(), timeMap = new Map()) {
+    this.cacheMap = cacheMap
+    this.timeMap = timeMap
+  }
+  set(key, value, duration) {
+    if (this.cacheMap.get(key)) {
+      this.cacheMap.set(key, value)
+      // 先 clear 原本的 Timeout 不然原本的還是會繼續運行
+      const originalTimeout = this.timeMap.get(key)
+      clearTimeout(originalTimeout)
+      this.timeMap.set(key, setTimeout(() => {
+        this.cacheMap.delete(key)
+      }, duration))
+      return true
+    } else {
+      this.cacheMap.set(key, value)
+      this.timeMap.set(key, setTimeout(() => {
+        this.cacheMap.delete(key)
+      }, duration))
+      return false
+    }
+  }
+  get(key) {
+    if (this.cacheMap.get(key)) {
+      return this.cacheMap.get(key)
+    } else {
+      return -1
+    }
+  }
+  count() {
+    return this.cacheMap.size
+  }
+}
+
+const timeLimitedCache = new TimeLimitedCache()
+console.log(timeLimitedCache.set(1, 42, 1000)); // false
+console.log(timeLimitedCache.get(1));
+console.log(timeLimitedCache.count());
+
+// 另一種方法：不用設定兩個 map，把 setTimeout 跟 value 寫在一起就好
+// this.cacheMap.set(key, {
+//   value,  // Equivalent to `value: value`
+//   ref: setTimeout(() => this.cache.delete(key), duration)
+// });
+
