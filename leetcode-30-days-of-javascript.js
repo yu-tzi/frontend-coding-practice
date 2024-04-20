@@ -264,3 +264,14 @@ console.log(timeLimitedCache.count());
 //   ref: setTimeout(() => this.cache.delete(key), duration)
 // });
 
+// 4.
+// Given a function fn and a time in milliseconds t, return a debounced version of that function.
+// A debounced function is a function whose execution is delayed by t milliseconds and whose execution is cancelled if it is called again within that window of time. The debounced function should also receive the passed parameters.
+// For example, let's say t = 50ms, and the function was called at 30ms, 60ms, and 100ms.
+// The first 2 function calls would be cancelled, and the 3rd function call would be executed at 150ms.
+// If instead t = 35ms, The 1st call would be cancelled, the 2nd would be executed at 95ms, and the 3rd would be executed at 135ms.
+
+// 第一次按下去之後，等 t，如果 t 還沒到就多按第二次，則回應是第二次 + t
+// 第一次按下去，setTimeout delay t 執行
+// 如果 t 到了，才二第二次，就 setTimeout delay t 執行
+// 如果 t 還沒到就按第二次，則 clearTimeout 並 delay t 執行
