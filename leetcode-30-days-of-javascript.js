@@ -271,7 +271,38 @@ console.log(timeLimitedCache.count());
 // The first 2 function calls would be cancelled, and the 3rd function call would be executed at 150ms.
 // If instead t = 35ms, The 1st call would be cancelled, the 2nd would be executed at 95ms, and the 3rd would be executed at 135ms.
 
-// 第一次按下去之後，等 t，如果 t 還沒到就多按第二次，則回應是第二次 + t
-// 第一次按下去，setTimeout delay t 執行
-// 如果 t 到了，才二第二次，就 setTimeout delay t 執行
-// 如果 t 還沒到就按第二次，則 clearTimeout 並 delay t 執行
+var debounce = function (fn, t) {
+  let timer = null
+  return function (...args) {
+    if (timer) {
+      clearTimeout(timer)
+      timer = setTimeout(() => { fn(...args) }, t)
+    } else {
+      timer = setTimeout(() => { fn(...args) }, t)
+    }
+  }
+};
+
+const log = debounce(console.log, 100);
+log('Hello'); // cancelled
+log('Hello'); // cancelled
+log('Hello'); // Logged at t=100ms
+
+// 其他做法：其實不用判斷 timer 存不存在，清掉就好
+
+var debounce = function (fn, t) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), t);
+  }
+};
+
+// 5.
+// Given an array of asynchronous functions functions, return a new promise promise. Each function in the array accepts no arguments and returns a promise. All the promises should be executed in parallel.
+// promise resolves:
+// When all the promises returned from functions were resolved successfully in parallel. The resolved value of promise should be an array of all the resolved values of promises in the same order as they were in the functions. The promise should resolve when all the asynchronous functions in the array have completed execution in parallel.
+// promise rejects:
+// When any of the promises returned from functions were rejected. promise should also reject with the reason of the first rejection.
+// Please solve it without using the built-in Promise.all function.
+
