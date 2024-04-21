@@ -306,3 +306,31 @@ var debounce = function (fn, t) {
 // When any of the promises returned from functions were rejected. promise should also reject with the reason of the first rejection.
 // Please solve it without using the built-in Promise.all function.
 
+var promiseAll = function (functions = []) {
+  return new Promise((resolve, reject) => {
+    // 用來記錄 promise 真正完成的狀態
+    let completedCount = 0
+    // 先建造出 index 數量相符合的 null Array 之後再替換掉
+    const resultArray = new Array(functions.length).fill(null);
+    functions.forEach((fn, index) => {
+      fn().then((result) => {
+        // 需要 promise 完成之後才能確定的判斷，都要放在 then 裡面
+        resultArray[index] = result
+        completedCount++
+        if (completedCount === functions.length) {
+          resolve(resultArray)
+        }
+      }).catch((error) => {
+        reject(error)
+      })
+    })
+  })
+};
+
+const promise = promiseAll([() => new Promise(res => res(42))])
+promise.then(console.log); // [42]
+
+// NOTE: forEach 處理 async 事件的特性
+// The forEach loop doesn't wait for the async function to complete before moving on to the next iteration. 
+// As a result, it logs Loop finished before any of the asynchronous operations are completed.
+
