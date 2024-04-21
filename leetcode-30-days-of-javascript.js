@@ -334,3 +334,33 @@ promise.then(console.log); // [42]
 // The forEach loop doesn't wait for the async function to complete before moving on to the next iteration. 
 // As a result, it logs Loop finished before any of the asynchronous operations are completed.
 
+// 6.
+// 實作一個 promise.race
+// The Promise.race() static method takes an iterable of promises as input and returns a single Promise. 
+// This returned promise settles with the eventual state of the first promise that settles.
+
+const mockPromiseRace = (functions) => {
+  return new Promise((resolve, reject) => {
+    functions.forEach((func) => {
+      func.then((result) => {
+        resolve(result)
+      }).catch((err) => { reject(err) })
+    })
+  })
+}
+
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 500, 'one');
+});
+
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, 'two');
+});
+
+mockPromiseRace([promise1, promise2]).then((value) => {
+  console.log(value);
+  // Both resolve, but promise2 is faster
+});
+// Expected output: "two"
+
+
